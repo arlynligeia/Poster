@@ -2,15 +2,17 @@ import * as THREE from 'three';
 
 // ---------- Sizes ----------
 const PRESETS = [
-  ['Vertical (screen)', '8K 4320×7680', 4320, 7680], ['Vertical (screen)', '4K DCI 2160×4096', 2160, 4096],
-  ['Vertical (screen)', '4K 2160×3840', 2160, 3840], ['Vertical (screen)', '2K 1080×2048', 1080, 2048],
-  ['Vertical (screen)', 'Full HD 1080×1920', 1080, 1920], ['Vertical (screen)', 'HD 720×1280', 720, 1280],
-  ['Horizontal banner', '8K 7680×4320', 7680, 4320], ['Horizontal banner', '4K DCI 4096×2160', 4096, 2160],
-  ['Horizontal banner', '4K 3840×2160', 3840, 2160], ['Horizontal banner', '2K 2048×1080', 2048, 1080],
-  ['Horizontal banner', 'Full HD 1920×1080', 1920, 1080], ['Horizontal banner', 'HD 1280×720', 1280, 720],
-  ['Print (inches)', 'Six sheet 81×81 in', 81, 81, 1], ['Print (inches)', 'Bus shelter 48×70 in', 48, 70, 1],
-  ['Print (inches)', 'Three sheet 41×81 in', 41, 81, 1], ['Print (inches)', 'One sheet 27×40 in', 27, 40, 1],
-  ['Print (inches)', 'Half sheet 22×28 in', 22, 28, 1], ['Print (inches)', 'Window card 14×22 in', 14, 22, 1],
+  ['Vertical Poster', '8K 4320×7680', 4320, 7680], ['Vertical Poster', '4K DCI 2160×4096', 2160, 4096],
+  ['Vertical Poster', '4K 2160×3840', 2160, 3840], ['Vertical Poster', '2K 1080×2048', 1080, 2048],
+  ['Vertical Poster', 'Full HD 1080×1920', 1080, 1920], ['Vertical Poster', 'HD 720×1280', 720, 1280],
+  ['Square Poster', '3000×3000', 3000, 3000], ['Square Poster', '2000×2000', 2000, 2000],
+  ['Square Poster', '1200×1200', 1200, 1200], ['Square Poster', '1080×1080', 1080, 1080],
+  ['Horizontal Banner', '8K 7680×4320', 7680, 4320], ['Horizontal Banner', '4K DCI 4096×2160', 4096, 2160],
+  ['Horizontal Banner', '4K 3840×2160', 3840, 2160], ['Horizontal Banner', '2K 2048×1080', 2048, 1080],
+  ['Horizontal Banner', 'Full HD 1920×1080', 1920, 1080], ['Horizontal Banner', 'HD 1280×720', 1280, 720],
+  ['Print Poster', 'Six sheet 81×81 in', 81, 81, 1], ['Print Poster', 'Bus shelter 48×70 in', 48, 70, 1],
+  ['Print Poster', 'Three sheet 41×81 in', 41, 81, 1], ['Print Poster', 'One sheet 27×40 in', 27, 40, 1],
+  ['Print Poster', 'Half sheet 22×28 in', 22, 28, 1], ['Print Poster', 'Window card 14×22 in', 14, 22, 1],
 ];
 const sizeEl = document.getElementById('size'), dpiEl = document.getElementById('dpi'), dpiBox = document.getElementById('dpiBox');
 const fovEl = document.getElementById('fov'), info = document.getElementById('info'), bar = document.getElementById('bar');
@@ -180,7 +182,8 @@ function fit() {
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.setSize(Math.floor(w), Math.floor(h));
   camera.aspect = r; camera.fov = +fovEl.value; camera.updateProjectionMatrix();
-  dpiBox.style.display = preset()[4] ? '' : 'none';
+  dpiEl.disabled = !preset()[4];                      // dpi only applies to print (inch) sizes
+  dpiBox.style.opacity = preset()[4] ? '' : '.4';
   const [ow, oh, cut] = outSize();
   info.textContent = `Will save: ${ow}×${oh} px${cut ? ' (reduced to browser limit)' : ''} · Drag: look · WASD: move · Q/E: down/up · R: reset · H: hide bar`;
 }

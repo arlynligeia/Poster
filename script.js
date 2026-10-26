@@ -81,9 +81,12 @@ tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(W / .8, L / .8); te
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(W, L), new THREE.MeshStandardMaterial({ map: tex, metalness: .75, roughness: .22, color: 0x6a58d0 }));
 floor.rotation.x = -Math.PI / 2; scene.add(floor);
 
+// Registro de luces por grupo (para poder apagarlas)
+const G = { neon: [], glow: [], lamp: [], amb: [] };
+
 // Neon lights
 const neon = hex => new THREE.MeshBasicMaterial({ color: hex });
-const box = (w, h, d, x, y, z, hex) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), neon(hex)); m.position.set(x, y, z); scene.add(m); return m; };
+const box = (w, h, d, x, y, z, hex) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), neon(hex)); m.position.set(x, y, z); scene.add(m); G.neon.push(m); return m; };
 // soft additive glow for halos and floor reflections
 const gc = document.createElement('canvas'); gc.width = gc.height = 64;
 const gg = gc.getContext('2d');
@@ -93,11 +96,11 @@ gg.fillStyle = gr; gg.fillRect(0, 0, 64, 64);
 const glowTex = new THREE.CanvasTexture(gc);
 function glow(x, y, z, hex, sx, sy, op = .5) {
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: hex, transparent: true, opacity: op, blending: THREE.AdditiveBlending, depthWrite: false }));
-  s.position.set(x, y, z); s.scale.set(sx, sy, 1); scene.add(s);
+  s.position.set(x, y, z); s.scale.set(sx, sy, 1); scene.add(s); G.glow.push(s);
 }
 function floorGlow(x, z, hex, w, l, op = .3) {
   const m = new THREE.Mesh(new THREE.PlaneGeometry(w, l), new THREE.MeshBasicMaterial({ map: glowTex, color: hex, transparent: true, opacity: op, blending: THREE.AdditiveBlending, depthWrite: false }));
-  m.rotation.x = -Math.PI / 2; m.position.set(x, .03, z); scene.add(m);
+  m.rotation.x = -Math.PI / 2; m.position.set(x, .03, z); scene.add(m); G.glow.push(m);
 }
 // ceiling strips: outer row (long) and inner row (thin, offset)
 for (let i = 0; i < 5; i++) for (const s of [-1, 1]) {
@@ -111,8 +114,6 @@ for (let i = 0; i < 4; i++) for (const s of [-1, 1]) {
   box(.05, .03, 1.1, s * 0.9, H - .37, z, col);
   glow(s * 0.9, H - .6, z, col, 1.6, 1.1, .35);
 }
-
-
 
 // continuous neon on all 12 edges (inset so the pyramids don't hide it)
 const ix = hw - .42, iz = hl - .42, iy = H - .4, TH = .06;
@@ -133,12 +134,10 @@ for (const e of [-1, 1]) {
   line(-ix, iy, e * iz, ix, iy, e * iz, VIO);                // ceiling edge, end walls
 }
 
-
-
-
 // Lights: magenta on the left, green-turquoise on the right
-scene.add(new THREE.AmbientLight(0x120a40, .35));
-const lamp = (hex, i, x, y, z, d = 12) => { const l = new THREE.PointLight(hex, i, d, 2); l.position.set(x, y, z); scene.add(l); };
+const ambient = new THREE.AmbientLight(0x120a40, .35);
+scene.add(ambient); G.amb.push(ambient);
+const lamp = (hex, i, x, y, z, d = 12) => { const l = new THREE.PointLight(hex, i, d, 2); l.position.set(x, y, z); scene.add(l); G.lamp.push(l); };
 lamp(MAG, 14, -2.3, H - .8, -4, 10); lamp(CYA, 14, -2.3, H - .8, 1, 10);
 lamp(CYA, 14, 2.3, H - .8, -4, 10);  lamp(MAG, 14, 2.3, H - .8, 1, 10);
 lamp(VIO, 8, 0, H - 1, -5, 9);
@@ -189,6 +188,29 @@ cv.addEventListener('pointermove', e => {
   drag = { x: e.clientX, y: e.clientY };
 });
 
+// ---------- Control de luces ----------
+const lightsBtn = document.getElementById('lights');
+const chk = {
+  neon: document.getElementById('gNeon'),
+  glow: document.getElementById('gGlow'),
+  lamp: document.getElementById('gLamp'),
+  amb: document.getElementById('gAmb'),
+};
+const anyLightOn = () => Object.values(chk).some(c => c.checked);
+function applyLights() {
+  for (const k in G) G[k].forEach(o => o.visible = chk[k].checked);
+  lightsBtn.textContent = anyLightOn() ? 'Luces: ON' : 'Luces: OFF';
+}
+function toggleAllLights() {
+  const on = !anyLightOn();                       // si alguna está encendida, apaga todo; si no, enciende todo
+  Object.values(chk).forEach(c => c.checked = on);
+  applyLights();
+}
+lightsBtn.onclick = toggleAllLights;
+Object.values(chk).forEach(c => c.onchange = applyLights);
+addEventListener('keydown', e => { if (e.code === 'KeyL') toggleAllLights(); });
+applyLights();
+
 // ---------- Preview ----------
 function fit() {
   const [, , pw, ph] = preset();
@@ -201,7 +223,7 @@ function fit() {
   dpiEl.disabled = !preset()[4];                      // dpi only applies to print (inch) sizes
   dpiBox.style.opacity = preset()[4] ? '' : '.4';
   const [ow, oh, cut] = outSize();
-  info.textContent = `Will save: ${ow}×${oh} px${cut ? ' (reduced to browser limit)' : ''} · Drag: look · WASD: move · Q/E: down/up · R: reset · H: hide bar`;
+  info.textContent = `Will save: ${ow}×${oh} px${cut ? ' (reduced to browser limit)' : ''} · Drag: look · WASD: move · Q/E: down/up · L: lights · R: reset · H: hide bar`;
 }
 sizeEl.onchange = () => { fovEl.value = preset()[2] > preset()[3] ? 55 : 70; fit(); };
 dpiEl.onchange = fovEl.oninput = fit;

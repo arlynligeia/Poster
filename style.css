@@ -1,11 +1,78 @@
-html, body { margin: 0; height: 100%; background: #000; overflow: hidden; font-family: system-ui, sans-serif; }
-#stage { position: fixed; inset: 0; display: grid; place-items: center; }
-canvas { display: block; touch-action: none; cursor: grab; }
-#bar { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center;
-       padding: 8px 12px; background: rgba(8, 4, 30, .88); border: 1px solid rgba(25, 217, 255, .4); border-radius: 8px; color: #9fd8ff; font-size: 13px; max-width: 94vw; }
-#bar.off { display: none; }
-#bar select, #bar button, #bar input { font: inherit; }
-#bar button { background: #19d9ff; color: #07031a; border: 0; border-radius: 5px; padding: 6px 12px; font-weight: 700; cursor: pointer; }
-#bar button:disabled { opacity: .5; cursor: wait; }
-#bar label { display: flex; align-items: center; gap: 6px; }
-#info { flex-basis: 100%; text-align: center; font-size: 12px; opacity: .85; }
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: system-ui, sans-serif;
+}
+
+#stage {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+canvas {
+  display: block;
+  touch-action: none;
+  cursor: grab;
+}
+
+#bar {
+  position: fixed;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  max-width: 94vw;
+  padding: 8px 12px;
+  background: rgba(8, 4, 30, .88);
+  border: 1px solid rgba(25, 217, 255, .4);
+  border-radius: 8px;
+  color: #9fd8ff;
+  font-size: 13px;
+}
+
+#bar.off {
+  display: none;
+}
+
+#bar select,
+#bar button,
+#bar input {
+  font: inherit;
+}
+
+#bar button {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 5px;
+  background: #19d9ff;
+  color: #07031a;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#bar button:disabled {
+  opacity: .5;
+  cursor: wait;
+}
+
+#bar label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#info {
+  flex-basis: 100%;
+  text-align: center;
+  font-size: 12px;
+  opacity: .85;
+}

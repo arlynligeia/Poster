@@ -1,2 +1,2 @@
-# poster
+# Poster
 Poster (Film - Music - Fashion)

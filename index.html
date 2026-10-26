@@ -17,17 +17,25 @@
 
   <body>
     <div id="stage"></div>
+    
     <div id="bar">
-      <label>Size <select id="size"></select></label>
-      <label id="dpiBox">Resolution <select id="dpi">
-        <option value="72">72 dpi</option><option value="100">100 dpi</option><option value="150" selected>150 dpi</option><option value="300">300 dpi</option>
-        </select>
-      </label>      
-      <label>Zoom <input id="fov" type="range" min="35" max="110" value="70"></label>
-      <button id="save">Save PNG</button>
-      <div id="info"></div>
-    </div>
+  <label>Size <select id="size"></select></label>
+  <label id="dpiBox">Resolution <select id="dpi">
+    <option value="72">72 dpi</option><option value="100">100 dpi</option><option value="150" selected>150 dpi</option><option value="300">300 dpi</option>
+    </select>
+  </label>
+  <label>Zoom <input id="fov" type="range" min="35" max="110" value="70"></label>
+  <button id="lights">Luces: ON</button>
+  <label><input type="checkbox" id="gNeon" checked> Neón</label>
+  <label><input type="checkbox" id="gGlow" checked> Brillos</label>
+  <label><input type="checkbox" id="gLamp" checked> Focos</label>
+  <label><input type="checkbox" id="gAmb" checked> Ambiente</label>
+  <button id="save">Save PNG</button>
+  <div id="info"></div>
+</div>
 
+
+    
     <script type="module" src="script.js"></script>
   </body>
   

@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 
 <html lang="en">
-  
+
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+
     <title>ANECHOIC CHAMBER 57 - POSTER</title>
-    
+
     <script type="importmap">
-      { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+      }
     </script>
 
     <link rel="stylesheet" href="style.css">
@@ -17,26 +22,25 @@
 
   <body>
     <div id="stage"></div>
-    
     <div id="bar">
-  <label>Size <select id="size"></select></label>
-  <label id="dpiBox">Resolution <select id="dpi">
-    <option value="72">72 dpi</option><option value="100">100 dpi</option><option value="150" selected>150 dpi</option><option value="300">300 dpi</option>
-    </select>
-  </label>
-  <label>Zoom <input id="fov" type="range" min="35" max="110" value="70"></label>
-  <button id="lights">Luces: ON</button>
-  <label><input type="checkbox" id="gNeon" checked> Neón</label>
-  <label><input type="checkbox" id="gGlow" checked> Brillos</label>
-  <label><input type="checkbox" id="gLamp" checked> Focos</label>
-  <label><input type="checkbox" id="gAmb" checked> Ambiente</label>
-  <button id="save">Save PNG</button>
-  <div id="info"></div>
-</div>
+      <label>Size <select id="size"></select></label>
+      <label id="dpiBox">Resolution <select id="dpi">
+        <option value="72">72 dpi</option><option value="100">100 dpi</option><option value="150" selected>150 dpi</option><option value="300">300 dpi</option>
+        </select>
+      </label>
+      <label>Zoom <input id="fov" type="range" min="35" max="110" value="70"></label>
+      <label>Exposición <input id="exposure" type="range" min="0.3" max="2" step="0.05" value="0.9"></label>
+      <label>Glow <input id="glowAmt" type="range" min="0" max="2" step="0.05" value="0.8"></label>
+      <button id="lights">Luces: ON</button>
+      <label><input type="checkbox" id="gNeon" checked> Neón</label>
+      <label><input type="checkbox" id="gGlow" checked> Brillos</label>
+      <label><input type="checkbox" id="gLamp" checked> Focos</label>
+      <label><input type="checkbox" id="gAmb" checked> Ambiente</label>
+      <button id="save">Save PNG</button>
+      <div id="info"></div>
+    </div>
 
-
-    
     <script type="module" src="script.js"></script>
   </body>
-  
+
 </html>

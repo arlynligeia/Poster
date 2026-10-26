@@ -28,15 +28,11 @@ const PRESETS = [
   ['Vertical Poster', '8K 4320×7680', 4320, 7680], ['Vertical Poster', '4K DCI 2160×4096', 2160, 4096],
   ['Vertical Poster', '4K 2160×3840', 2160, 3840], ['Vertical Poster', '2K 1080×2048', 1080, 2048],
   ['Vertical Poster', 'Full HD 1080×1920', 1080, 1920], ['Vertical Poster', 'HD 720×1280', 720, 1280],
-  
-  ['Square Poster', '4320×4320', 4320, 4320],
   ['Square Poster', '3000×3000', 3000, 3000], ['Square Poster', '2000×2000', 2000, 2000],
   ['Square Poster', '1200×1200', 1200, 1200], ['Square Poster', '1080×1080', 1080, 1080],
-  
   ['Horizontal Banner', '8K 7680×4320', 7680, 4320], ['Horizontal Banner', '4K DCI 4096×2160', 4096, 2160],
   ['Horizontal Banner', '4K 3840×2160', 3840, 2160], ['Horizontal Banner', '2K 2048×1080', 2048, 1080],
   ['Horizontal Banner', 'Full HD 1920×1080', 1920, 1080], ['Horizontal Banner', 'HD 1280×720', 1280, 720],
-  
   ['Print Poster', 'Six sheet 81×81 in', 81, 81, 1], ['Print Poster', 'Bus shelter 48×70 in', 48, 70, 1],
   ['Print Poster', 'Three sheet 41×81 in', 41, 81, 1], ['Print Poster', 'One sheet 27×40 in', 27, 40, 1],
   ['Print Poster', 'Half sheet 22×28 in', 22, 28, 1], ['Print Poster', 'Window card 14×22 in', 14, 22, 1],
@@ -291,22 +287,6 @@ const kickMat = new THREE.MeshStandardMaterial({ color: 0xb8c4ca, metalness: 1, 
 const rubber = new THREE.MeshStandardMaterial({ color: 0x040404, roughness: .95, metalness: 0 });
 const chrome = new THREE.MeshStandardMaterial({ color: 0xdfe6ea, metalness: 1, roughness: .18, envMapIntensity: 1.6 });
 
-// placa de advertencia
-const pc = document.createElement('canvas'); pc.width = 512; pc.height = 192;
-{
-  const g = pc.getContext('2d');
-  g.fillStyle = '#0d1216'; g.fillRect(0, 0, 512, 192);
-  g.fillStyle = '#f2c200'; g.fillRect(0, 0, 512, 62);
-  g.fillStyle = '#111'; g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.font = 'bold 36px Arial, sans-serif'; g.fillText('ANECHOIC CHAMBER 57', 256, 33);
-  g.fillStyle = '#e8eef2'; g.font = 'bold 28px Arial, sans-serif'; g.fillText('AUTHORIZED PERSONNEL ONLY', 256, 110);
-  g.fillStyle = '#8fa0aa'; g.font = '22px Arial, sans-serif'; g.fillText('KEEP DOOR CLOSED DURING TESTING', 256, 156);
-  g.strokeStyle = '#3a4a54'; g.lineWidth = 4; g.strokeRect(2, 2, 508, 188);
-}
-const plateTex = new THREE.CanvasTexture(pc);
-plateTex.colorSpace = THREE.SRGBColorSpace; plateTex.anisotropy = maxAniso;
-const plateMat = new THREE.MeshStandardMaterial({ map: plateTex, roughness: .45, metalness: .3, envMapIntensity: .8 });
-
 // marco pesado fijo + juntas de goma
 const fm = (w, h, d, x, y, z, mat) => { const m = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 2, .012), mat); m.position.set(x, y, z); scene.add(m); return m; };
 const sm = (w, h, d, x, y, z, mat) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); scene.add(m); return m; };
@@ -327,7 +307,6 @@ const dm = (geo, mat, x, y, z, rx = 0) => { const m = new THREE.Mesh(geo, mat); 
 dm(new RoundedBoxGeometry(1.3, 2.2, .1, 3, .015), doorSteel, -.65, 1.1, 0);          // hoja
 dm(new RoundedBoxGeometry(1.0, 1.7, .02, 2, .008), doorPaint, -.65, 1.15, .055);     // panel central
 dm(new RoundedBoxGeometry(1.0, .22, .012, 1, .004), kickMat, -.65, .2, .07);         // placa inferior
-dm(new THREE.PlaneGeometry(.5, .19), plateMat, -.65, 1.72, .072);                    // placa de advertencia
 // manija vertical con soportes + placa
 dm(new RoundedBoxGeometry(.09, .34, .012, 1, .004), doorSteel, -1.225, 1.05, .07);
 dm(new THREE.CylinderGeometry(.01, .01, .07, 12), chrome, -1.225, .85, .09, Math.PI / 2);
@@ -391,11 +370,16 @@ const pmrem = new THREE.PMREMGenerator(renderer);
 let envRT = null;
 function updateEnv() {
   floor.visible = false; scene.environment = null;
-  cubeCam.update(renderer, scene);
-  floor.visible = true;
-  const next = pmrem.fromCubemap(cubeRT.texture);
-  if (envRT) envRT.dispose();
-  envRT = next; scene.environment = next.texture;
+  try {
+    cubeCam.update(renderer, scene);
+    const next = pmrem.fromCubemap(cubeRT.texture);
+    if (envRT) envRT.dispose();
+    envRT = next; scene.environment = next.texture;
+  } catch (err) {
+    console.error('updateEnv falló:', err);
+  } finally {
+    floor.visible = true;                 // el piso siempre vuelve a mostrarse, pase lo que pase
+  }
 }
 
 // ---------- Postprocesado (bloom + grano + viñeta + aberración) ----------

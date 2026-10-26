@@ -111,14 +111,30 @@ for (let i = 0; i < 4; i++) for (const s of [-1, 1]) {
   box(.05, .03, 1.1, s * 0.9, H - .37, z, col);
   glow(s * 0.9, H - .6, z, col, 1.6, 1.1, .35);
 }
-// floor neons and back corners
+
+
+
+// continuous neon on all 12 edges (inset so the pyramids don't hide it)
+const ix = hw - .42, iz = hl - .42, iy = H - .4, TH = .06;
+const line = (x1, y1, z1, x2, y2, z2, hex) =>
+  box(Math.abs(x2 - x1) + TH, Math.abs(y2 - y1) + TH, Math.abs(z2 - z1) + TH, (x1 + x2) / 2, (y1 + y2) / 2, (z1 + z2) / 2, hex);
 for (const s of [-1, 1]) {
-  box(.06, .03, L - 1, s * (hw - .45), .02, 0, s < 0 ? MAG : CYA);
-  box(1.8, .03, .06, s * (hw - 1.5), .02, -hl + .45, CYA);
-  box(.04, 3.4, .04, s * (hw - .4), 1.7, -hl + .4, CYA);
-  glow(s * (hw - 1.5), .25, -hl + .6, CYA, 2.4, .9, .6);
-  glow(s * (hw - .5), 1.7, -hl + .6, CYA, .8, 3.8, .3);
+  const col = s < 0 ? MAG : CYA;
+  line(s * ix, .03, -iz, s * ix, .03, iz, col);              // floor edge, long side
+  line(s * ix, iy, -iz, s * ix, iy, iz, col);                // ceiling edge, long side
+  for (const e of [-1, 1]) {
+    line(s * ix, .03, e * iz, s * ix, iy, e * iz, col);      // vertical corners
+    glow(s * ix, H / 2, e * iz, col, .9, H, .25);
+  }
+  for (let z = -5; z <= 5; z += 2.5) glow(s * ix, .25, z, col, 2.2, .8, .35);
 }
+for (const e of [-1, 1]) {
+  line(-ix, .03, e * iz, ix, .03, e * iz, VIO);              // floor edge, end walls
+  line(-ix, iy, e * iz, ix, iy, e * iz, VIO);                // ceiling edge, end walls
+}
+
+
+
 
 // Lights: magenta on the left, green-turquoise on the right
 scene.add(new THREE.AmbientLight(0x120a40, .35));

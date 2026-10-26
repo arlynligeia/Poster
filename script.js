@@ -5,8 +5,11 @@ const PRESETS = [
   ['Vertical Poster', '8K 4320×7680', 4320, 7680], ['Vertical Poster', '4K DCI 2160×4096', 2160, 4096],
   ['Vertical Poster', '4K 2160×3840', 2160, 3840], ['Vertical Poster', '2K 1080×2048', 1080, 2048],
   ['Vertical Poster', 'Full HD 1080×1920', 1080, 1920], ['Vertical Poster', 'HD 720×1280', 720, 1280],
-  ['Square Poster', '3000×3000', 3000, 3000], ['Square Poster', '2000×2000', 2000, 2000],
-  ['Square Poster', '1200×1200', 1200, 1200], ['Square Poster', '1080×1080', 1080, 1080],
+  
+  ['Square Poster', '4320x4320', 4320, 4320], ['Square Poster', '3000×3000', 3000, 3000],
+  ['Square Poster', '2000×2000', 2000, 2000], ['Square Poster', '1200×1200', 1200, 1200],
+  ['Square Poster', '1080×1080', 1080, 1080],
+  
   ['Horizontal Banner', '8K 7680×4320', 7680, 4320], ['Horizontal Banner', '4K DCI 4096×2160', 4096, 2160],
   ['Horizontal Banner', '4K 3840×2160', 3840, 2160], ['Horizontal Banner', '2K 2048×1080', 2048, 1080],
   ['Horizontal Banner', 'Full HD 1920×1080', 1920, 1080], ['Horizontal Banner', 'HD 1280×720', 1280, 720],

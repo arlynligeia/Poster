@@ -20,6 +20,10 @@ canvas {
   cursor: grab;
 }
 
+canvas:active {
+  cursor: grabbing;
+}
+
 #bar {
   position: fixed;
   left: 50%;
@@ -47,6 +51,10 @@ canvas {
 #bar button,
 #bar input {
   font: inherit;
+}
+
+#bar input[type="range"] {
+  width: 90px;
 }
 
 #bar button {

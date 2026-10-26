@@ -214,7 +214,7 @@ saveBtn.onclick = async () => {
   camera.clearViewOffset();
   out.toBlob(b => {
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(b); a.download = `anechoic-chamber-${OW}x${OH}.png`; a.click();
+    a.href = URL.createObjectURL(b); a.download = `AC57 - ${OW}x${OH}.png`; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     saveBtn.disabled = false; fit();
   }, 'image/png');

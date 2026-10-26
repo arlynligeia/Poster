@@ -1,16 +1,16 @@
 import * as THREE from 'three';
 
-// ---------- Tamaños ----------
+// ---------- Sizes ----------
 const PRESETS = [
-  ['Vertical (pantalla)', '8K 4320×7680', 4320, 7680], ['Vertical (pantalla)', '4K DCI 2160×4096', 2160, 4096],
-  ['Vertical (pantalla)', '4K 2160×3840', 2160, 3840], ['Vertical (pantalla)', '2K 1080×2048', 1080, 2048],
-  ['Vertical (pantalla)', 'Full HD 1080×1920', 1080, 1920], ['Vertical (pantalla)', 'HD 720×1280', 720, 1280],
-  ['Banner horizontal', '8K 7680×4320', 7680, 4320], ['Banner horizontal', '4K DCI 4096×2160', 4096, 2160],
-  ['Banner horizontal', '4K 3840×2160', 3840, 2160], ['Banner horizontal', '2K 2048×1080', 2048, 1080],
-  ['Banner horizontal', 'Full HD 1920×1080', 1920, 1080], ['Banner horizontal', 'HD 1280×720', 1280, 720],
-  ['Impresión (pulgadas)', 'Six sheet 81×81 in', 81, 81, 1], ['Impresión (pulgadas)', 'Parada de bus 48×70 in', 48, 70, 1],
-  ['Impresión (pulgadas)', 'Three sheet 41×81 in', 41, 81, 1], ['Impresión (pulgadas)', 'One sheet 27×40 in', 27, 40, 1],
-  ['Impresión (pulgadas)', 'Half sheet 22×28 in', 22, 28, 1], ['Impresión (pulgadas)', 'Window card 14×22 in', 14, 22, 1],
+  ['Vertical (screen)', '8K 4320×7680', 4320, 7680], ['Vertical (screen)', '4K DCI 2160×4096', 2160, 4096],
+  ['Vertical (screen)', '4K 2160×3840', 2160, 3840], ['Vertical (screen)', '2K 1080×2048', 1080, 2048],
+  ['Vertical (screen)', 'Full HD 1080×1920', 1080, 1920], ['Vertical (screen)', 'HD 720×1280', 720, 1280],
+  ['Horizontal banner', '8K 7680×4320', 7680, 4320], ['Horizontal banner', '4K DCI 4096×2160', 4096, 2160],
+  ['Horizontal banner', '4K 3840×2160', 3840, 2160], ['Horizontal banner', '2K 2048×1080', 2048, 1080],
+  ['Horizontal banner', 'Full HD 1920×1080', 1920, 1080], ['Horizontal banner', 'HD 1280×720', 1280, 720],
+  ['Print (inches)', 'Six sheet 81×81 in', 81, 81, 1], ['Print (inches)', 'Bus shelter 48×70 in', 48, 70, 1],
+  ['Print (inches)', 'Three sheet 41×81 in', 41, 81, 1], ['Print (inches)', 'One sheet 27×40 in', 27, 40, 1],
+  ['Print (inches)', 'Half sheet 22×28 in', 22, 28, 1], ['Print (inches)', 'Window card 14×22 in', 14, 22, 1],
 ];
 const sizeEl = document.getElementById('size'), dpiEl = document.getElementById('dpi'), dpiBox = document.getElementById('dpiBox');
 const fovEl = document.getElementById('fov'), info = document.getElementById('info'), bar = document.getElementById('bar');
@@ -27,7 +27,7 @@ function outSize() {
   return [Math.round(W * k), Math.round(H * k), k < 1];
 }
 
-// ---------- Escena ----------
+// ---------- Scene ----------
 const W = 8, H = 5.5, L = 14, hw = W / 2, hl = L / 2, DX = 1.5;
 const MAG = 0xff2bd6, CYA = 0x22b8ff, VIO = 0x8a3cff;
 const stage = document.getElementById('stage');
@@ -63,11 +63,11 @@ function panel(origin, u, v, lenU, lenV, normal, skip) {
 const X = new THREE.Vector3(1, 0, 0), Y = new THREE.Vector3(0, 1, 0), Z = new THREE.Vector3(0, 0, 1);
 panel(new THREE.Vector3(-hw, 0, -hl), Z, Y, L, H, X);
 panel(new THREE.Vector3(hw, 0, -hl), Z, Y, L, H, X.clone().negate());
-panel(new THREE.Vector3(-hw, 0, -hl), X, Y, W, H, Z, p => Math.abs(p.x - DX) < 0.95 && p.y < 2.6); // pared del fondo, hueco para la puerta
+panel(new THREE.Vector3(-hw, 0, -hl), X, Y, W, H, Z, p => Math.abs(p.x - DX) < 0.95 && p.y < 2.6); // back wall, gap for the door
 panel(new THREE.Vector3(-hw, 0, hl), X, Y, W, H, Z.clone().negate());
 panel(new THREE.Vector3(-hw, H, -hl), X, Z, W, L, Y.clone().negate());
 
-// Suelo de rejilla metálica
+// Metal grate floor
 const c = document.createElement('canvas'); c.width = c.height = 256;
 const g = c.getContext('2d');
 g.fillStyle = '#0b0a2a'; g.fillRect(0, 0, 256, 256);
@@ -79,10 +79,10 @@ tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(W / .8, L / .8); te
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(W, L), new THREE.MeshStandardMaterial({ map: tex, metalness: .75, roughness: .22, color: 0x6a58d0 }));
 floor.rotation.x = -Math.PI / 2; scene.add(floor);
 
-// Neones
+// Neon lights
 const neon = hex => new THREE.MeshBasicMaterial({ color: hex });
 const box = (w, h, d, x, y, z, hex) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), neon(hex)); m.position.set(x, y, z); scene.add(m); return m; };
-// resplandor suave (aditivo) para halos y reflejos en el suelo
+// soft additive glow for halos and floor reflections
 const gc = document.createElement('canvas'); gc.width = gc.height = 64;
 const gg = gc.getContext('2d');
 const gr = gg.createRadialGradient(32, 32, 0, 32, 32, 32);
@@ -97,7 +97,7 @@ function floorGlow(x, z, hex, w, l, op = .3) {
   const m = new THREE.Mesh(new THREE.PlaneGeometry(w, l), new THREE.MeshBasicMaterial({ map: glowTex, color: hex, transparent: true, opacity: op, blending: THREE.AdditiveBlending, depthWrite: false }));
   m.rotation.x = -Math.PI / 2; m.position.set(x, .03, z); scene.add(m);
 }
-// tiras del techo: fila exterior (larga) e interior (fina, desfasada)
+// ceiling strips: outer row (long) and inner row (thin, offset)
 for (let i = 0; i < 5; i++) for (const s of [-1, 1]) {
   const col = (i + (s > 0 ? 1 : 0)) % 2 ? CYA : MAG, z = -5.5 + i * 2.6;
   box(.12, .04, 1.6, s * 2.3, H - .37, z, col);
@@ -109,7 +109,7 @@ for (let i = 0; i < 4; i++) for (const s of [-1, 1]) {
   box(.05, .03, 1.1, s * 0.9, H - .37, z, col);
   glow(s * 0.9, H - .6, z, col, 1.6, 1.1, .35);
 }
-// neones de suelo y esquinas del fondo
+// floor neons and back corners
 for (const s of [-1, 1]) {
   box(.06, .03, L - 1, s * (hw - .45), .02, 0, s < 0 ? MAG : CYA);
   box(1.8, .03, .06, s * (hw - 1.5), .02, -hl + .45, CYA);
@@ -118,16 +118,16 @@ for (const s of [-1, 1]) {
   glow(s * (hw - .5), 1.7, -hl + .6, CYA, .8, 3.8, .3);
 }
 
-// Luces: magenta a la izquierda, verde-turquesa a la derecha
+// Lights: magenta on the left, green-turquoise on the right
 scene.add(new THREE.AmbientLight(0x120a40, .35));
 const lamp = (hex, i, x, y, z, d = 12) => { const l = new THREE.PointLight(hex, i, d, 2); l.position.set(x, y, z); scene.add(l); };
 lamp(MAG, 14, -2.3, H - .8, -4, 10); lamp(CYA, 14, -2.3, H - .8, 1, 10);
 lamp(CYA, 14, 2.3, H - .8, -4, 10);  lamp(MAG, 14, 2.3, H - .8, 1, 10);
 lamp(VIO, 8, 0, H - 1, -5, 9);
-lamp(MAG, 9, DX - .6, 1.8, -hl + 1.1, 6);   // luz del marco de la puerta
+lamp(MAG, 9, DX - .6, 1.8, -hl + 1.1, 6);   // door frame light
 lamp(CYA, 5, -2.5, 1.2, -hl + 1.2, 6);
 
-// ---------- Puerta (pared del fondo, a la derecha del centro) ----------
+// ---------- Door (back wall, right of center) ----------
 const dz = -hl + 0.08;
 const dc = document.createElement('canvas'); dc.width = 256; dc.height = 512;
 const dg = dc.getContext('2d');
@@ -142,20 +142,20 @@ const door = new THREE.Mesh(new THREE.BoxGeometry(1.3, 2.2, .08), new THREE.Mesh
 door.position.set(DX, 1.1, dz); scene.add(door);
 const dark = new THREE.MeshStandardMaterial({ color: 0x06060f, metalness: .5, roughness: .5 });
 const part = (w, h, d, x, y, z, mat) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); scene.add(m); };
-part(.1, 2.35, .16, DX - .72, 1.17, dz, dark);   // marco
+part(.1, 2.35, .16, DX - .72, 1.17, dz, dark);   // frame
 part(.1, 2.35, .16, DX + .72, 1.17, dz, dark);
 part(1.54, .1, .16, DX, 2.3, dz, dark);
 const steel = new THREE.MeshStandardMaterial({ color: 0xc9d4dc, metalness: .9, roughness: .3 });
-part(.2, .05, .06, DX - .45, 1.05, dz + .07, steel);  // manija
+part(.2, .05, .06, DX - .45, 1.05, dz + .07, steel);  // handle
 part(.05, .1, .05, DX - .55, 1.05, dz + .05, steel);
-[.3, 1.1, 1.9].forEach(y => part(.05, .16, .05, DX + .68, y, dz + .06, steel)); // bisagras (derecha)
-// marco de neón magenta alrededor de la puerta
+[.3, 1.1, 1.9].forEach(y => part(.05, .16, .05, DX + .68, y, dz + .06, steel)); // hinges (right)
+// magenta neon frame around the door
 box(.04, 2.42, .04, DX - .8, 1.21, dz + .1, MAG);
 box(.04, 2.42, .04, DX + .8, 1.21, dz + .1, MAG);
 box(1.64, .04, .04, DX, 2.42, dz + .1, MAG);
 glow(DX, 1.2, dz + .3, MAG, 3.2, 3.8, .35);
 
-// ---------- Controles ----------
+// ---------- Controls ----------
 const START = { x: 0, y: 2.0, z: 0.5, yaw: 0, pitch: 0 };
 const pos = { ...START };
 const keys = {};
@@ -171,7 +171,7 @@ cv.addEventListener('pointermove', e => {
   drag = { x: e.clientX, y: e.clientY };
 });
 
-// ---------- Vista previa ----------
+// ---------- Preview ----------
 function fit() {
   const [, , pw, ph] = preset();
   const r = pw / ph;
@@ -182,13 +182,13 @@ function fit() {
   camera.aspect = r; camera.fov = +fovEl.value; camera.updateProjectionMatrix();
   dpiBox.style.display = preset()[4] ? '' : 'none';
   const [ow, oh, cut] = outSize();
-  info.textContent = `Se guardará: ${ow}×${oh} px${cut ? ' (reducido al límite del navegador)' : ''} · Arrastra: mirar · WASD: mover · Q/E: bajar/subir · R: reiniciar · H: ocultar barra`;
+  info.textContent = `Will save: ${ow}×${oh} px${cut ? ' (reduced to browser limit)' : ''} · Drag: look · WASD: move · Q/E: down/up · R: reset · H: hide bar`;
 }
 sizeEl.onchange = () => { fovEl.value = preset()[2] > preset()[3] ? 55 : 70; fit(); };
 dpiEl.onchange = fovEl.oninput = fit;
 addEventListener('resize', fit);
 
-// ---------- Guardar PNG (por mosaicos, para tamaños enormes) ----------
+// ---------- Save PNG (in tiles, for huge sizes) ----------
 const saveBtn = document.getElementById('save');
 saveBtn.onclick = async () => {
   saveBtn.disabled = true;
@@ -205,13 +205,13 @@ saveBtn.onclick = async () => {
     camera.setViewOffset(OW, OH, x, y, tw, th); camera.updateProjectionMatrix();
     renderer.render(scene, camera);
     ctx.drawImage(cv, 0, 0, tw, th, x, y, tw, th);
-    info.textContent = `Generando… ${Math.round(((y / T) * Math.ceil(OW / T) + x / T + 1) / (Math.ceil(OH / T) * Math.ceil(OW / T)) * 100)}%`;
+    info.textContent = `Generating… ${Math.round(((y / T) * Math.ceil(OW / T) + x / T + 1) / (Math.ceil(OH / T) * Math.ceil(OW / T)) * 100)}%`;
     await new Promise(r => setTimeout(r));
   }
   camera.clearViewOffset();
   out.toBlob(b => {
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(b); a.download = `camara-anecoica-${OW}x${OH}.png`; a.click();
+    a.href = URL.createObjectURL(b); a.download = `anechoic-chamber-${OW}x${OH}.png`; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     saveBtn.disabled = false; fit();
   }, 'image/png');

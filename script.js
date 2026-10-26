@@ -5,6 +5,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 // ---------- Ajustes rápidos (aquí afinas el look) ----------
 const CFG = {
@@ -19,6 +20,7 @@ const CFG = {
   vignette: 0.55,
   grain: 0.035,
   chroma: 0.02,       // aberración cromática en los bordes
+  doorOpen: 0,        // puerta: 0 = cerrada; ~0.35 = entreabierta con luz del pasillo (radianes)
 };
 
 // ---------- Sizes ----------
@@ -255,28 +257,122 @@ lamp(VIO, 8, 0, H - 1, -5, 9);
 lamp(MAG, 9, DX - .6, 1.8, -hl + 1.1, 6);   // door frame light
 lamp(CYA, 5, -2.5, 1.2, -hl + 1.2, 6);
 
-// ---------- Door (back wall, right of center) ----------
+// ---------- Puerta de cámara anecoica (blindada, acero cepillado) ----------
 const dz = -hl + 0.08;
-const doorTex = canvasTex(512, (dg, n) => {
-  dg.fillStyle = '#0c1a1d'; dg.fillRect(0, 0, n, n);
-  dg.strokeStyle = '#2e5a60'; dg.lineWidth = 2;
-  for (let y = 0; y < n; y += 16) for (let x = 0; x < n; x += 16) {
-    const o = ((x + y) / 16) % 2 ? 0 : 8;
-    dg.beginPath(); dg.moveTo(x + o, y + 2); dg.lineTo(x + o + 6, y + 10); dg.stroke();
+
+// acero cepillado: vetas horizontales finas + manchas suaves
+function brushedCanvas(g, n, base, streaks) {
+  g.fillStyle = base; g.fillRect(0, 0, n, n);
+  for (let i = 0; i < streaks; i++) {
+    const x = Math.random() * n, y = Math.random() * n, l = 60 + Math.random() * 500;
+    const v = Math.random() < .5 ? 255 : 0;
+    g.strokeStyle = `rgba(${v},${v},${v},${.02 + Math.random() * .06})`;
+    g.lineWidth = .5 + Math.random() * 1.2;
+    g.beginPath(); g.moveTo(x, y); g.lineTo(x + l, y + (Math.random() - .5) * 1.5); g.stroke();
   }
-});
-doorTex.repeat.set(.5, 1);   // textura cuadrada para evitar deformar el patrón
-const door = new THREE.Mesh(new THREE.BoxGeometry(1.3, 2.2, .08), new THREE.MeshStandardMaterial({ map: doorTex, metalness: .6, roughness: .4, envMapIntensity: 1 }));
-door.position.set(DX, 1.1, dz); scene.add(door);
-const dark = new THREE.MeshStandardMaterial({ color: 0x06060f, metalness: .5, roughness: .5 });
-const part = (w, h, d, x, y, z, mat) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); scene.add(m); };
-part(.1, 2.35, .16, DX - .72, 1.17, dz, dark);   // frame
-part(.1, 2.35, .16, DX + .72, 1.17, dz, dark);
-part(1.54, .1, .16, DX, 2.3, dz, dark);
-const steel = new THREE.MeshStandardMaterial({ color: 0xc9d4dc, metalness: .9, roughness: .3, envMapIntensity: 1 });
-part(.2, .05, .06, DX - .45, 1.05, dz + .07, steel);  // handle
-part(.05, .1, .05, DX - .55, 1.05, dz + .05, steel);
-[.3, 1.1, 1.9].forEach(y => part(.05, .16, .05, DX + .68, y, dz + .06, steel)); // hinges (right)
+  for (let i = 0; i < 40; i++) {                       // huellas / manchas
+    const x = Math.random() * n, y = Math.random() * n, r = 40 + Math.random() * 110;
+    const rg = g.createRadialGradient(x, y, 0, x, y, r);
+    rg.addColorStop(0, 'rgba(255,255,255,.07)'); rg.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = rg; g.fillRect(x - r, y - r, r * 2, r * 2);
+  }
+}
+const steelMap = canvasTex(1024, (g, n) => brushedCanvas(g, n, '#8c969c', 9000));
+const steelRough = canvasTex(1024, (g, n) => brushedCanvas(g, n, '#9a9a9a', 9000), false);
+
+const doorSteel = new THREE.MeshStandardMaterial({ map: steelMap, roughnessMap: steelRough, bumpMap: steelRough, bumpScale: .25, color: 0xb4c6cf, metalness: .92, roughness: .8, envMapIntensity: 1.5 });
+const doorPaint = new THREE.MeshStandardMaterial({ color: 0x24343c, metalness: .55, roughness: .42, envMapIntensity: 1.2 });
+const frameMat = new THREE.MeshStandardMaterial({ map: steelMap, roughnessMap: steelRough, color: 0x5a6a73, metalness: .9, roughness: .75, envMapIntensity: 1.3 });
+const kickMat = new THREE.MeshStandardMaterial({ color: 0xb8c4ca, metalness: 1, roughness: .35, envMapIntensity: 1.4 });
+const rubber = new THREE.MeshStandardMaterial({ color: 0x040404, roughness: .95, metalness: 0 });
+const chrome = new THREE.MeshStandardMaterial({ color: 0xdfe6ea, metalness: 1, roughness: .18, envMapIntensity: 1.6 });
+
+// placa de advertencia
+const pc = document.createElement('canvas'); pc.width = 512; pc.height = 192;
+{
+  const g = pc.getContext('2d');
+  g.fillStyle = '#0d1216'; g.fillRect(0, 0, 512, 192);
+  g.fillStyle = '#f2c200'; g.fillRect(0, 0, 512, 62);
+  g.fillStyle = '#111'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.font = 'bold 36px Arial, sans-serif'; g.fillText('ANECHOIC CHAMBER 57', 256, 33);
+  g.fillStyle = '#e8eef2'; g.font = 'bold 28px Arial, sans-serif'; g.fillText('AUTHORIZED PERSONNEL ONLY', 256, 110);
+  g.fillStyle = '#8fa0aa'; g.font = '22px Arial, sans-serif'; g.fillText('KEEP DOOR CLOSED DURING TESTING', 256, 156);
+  g.strokeStyle = '#3a4a54'; g.lineWidth = 4; g.strokeRect(2, 2, 508, 188);
+}
+const plateTex = new THREE.CanvasTexture(pc);
+plateTex.colorSpace = THREE.SRGBColorSpace; plateTex.anisotropy = maxAniso;
+const plateMat = new THREE.MeshStandardMaterial({ map: plateTex, roughness: .45, metalness: .3, envMapIntensity: .8 });
+
+// marco pesado fijo + juntas de goma
+const fm = (w, h, d, x, y, z, mat) => { const m = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 2, .012), mat); m.position.set(x, y, z); scene.add(m); return m; };
+const sm = (w, h, d, x, y, z, mat) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); scene.add(m); return m; };
+fm(.12, 2.4, .18, DX - .73, 1.2, dz, frameMat);
+fm(.12, 2.4, .18, DX + .73, 1.2, dz, frameMat);
+fm(1.58, .12, .18, DX, 2.3, dz, frameMat);
+sm(.016, 2.22, .1, DX - .668, 1.11, dz, rubber);   // junta izquierda
+sm(.016, 2.22, .1, DX + .668, 1.11, dz, rubber);   // junta derecha
+sm(1.34, .04, .1, DX, 2.22, dz, rubber);           // junta superior
+fm(1.46, .025, .3, DX, .012, dz + .12, kickMat);   // umbral metálico
+
+// hoja de la puerta (gira sobre el eje de las bisagras, a la derecha)
+const doorPivot = new THREE.Group();
+doorPivot.position.set(DX + .65, 0, dz);
+doorPivot.rotation.y = CFG.doorOpen;
+scene.add(doorPivot);
+const dm = (geo, mat, x, y, z, rx = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.x = rx; doorPivot.add(m); return m; };
+dm(new RoundedBoxGeometry(1.3, 2.2, .1, 3, .015), doorSteel, -.65, 1.1, 0);          // hoja
+dm(new RoundedBoxGeometry(1.0, 1.7, .02, 2, .008), doorPaint, -.65, 1.15, .055);     // panel central
+dm(new RoundedBoxGeometry(1.0, .22, .012, 1, .004), kickMat, -.65, .2, .07);         // placa inferior
+dm(new THREE.PlaneGeometry(.5, .19), plateMat, -.65, 1.72, .072);                    // placa de advertencia
+// manija vertical con soportes + placa
+dm(new RoundedBoxGeometry(.09, .34, .012, 1, .004), doorSteel, -1.225, 1.05, .07);
+dm(new THREE.CylinderGeometry(.01, .01, .07, 12), chrome, -1.225, .85, .09, Math.PI / 2);
+dm(new THREE.CylinderGeometry(.01, .01, .07, 12), chrome, -1.225, 1.25, .09, Math.PI / 2);
+dm(new THREE.CylinderGeometry(.017, .017, .5, 16), chrome, -1.225, 1.05, .125);
+// lector de tarjeta con pantalla verde
+dm(new RoundedBoxGeometry(.09, .13, .03, 2, .01), rubber, -1.225, 1.5, .07);
+{
+  const led = new THREE.Mesh(new THREE.BoxGeometry(.06, .025, .006), neon(0x30ff90));
+  led.position.set(-1.225, 1.535, .088); doorPivot.add(led); G.neon.push(led);
+}
+// bisagras grandes
+for (const y of [.3, 1.1, 1.9]) {
+  dm(new THREE.CylinderGeometry(.03, .03, .2, 16), kickMat, 0, y, .02);
+  dm(new THREE.BoxGeometry(.14, .18, .014), frameMat, -.07, y, .062);
+}
+// tornillos del borde
+{
+  const boltGeo = new THREE.CylinderGeometry(.011, .011, .012, 10); boltGeo.rotateX(Math.PI / 2);
+  const pts = [];
+  for (let x = -1.225; x <= -.07; x += .165) { pts.push([x, .075], [x, 2.125]); }
+  for (let y = .24; y <= 2.0; y += .17) {
+    pts.push([-.075, y]);
+    if (Math.abs(y - 1.05) > .4) pts.push([-1.225, y]);
+  }
+  const bolts = new THREE.InstancedMesh(boltGeo, chrome, pts.length), mm = new THREE.Matrix4();
+  pts.forEach(([x, y], i) => { mm.makeTranslation(x, y, .056); bolts.setMatrixAt(i, mm); });
+  doorPivot.add(bolts);
+}
+// luz roja de aviso sobre la puerta
+fm(.2, .07, .06, DX, 2.505, dz + .04, rubber);
+box(.16, .035, .02, DX, 2.505, dz + .075, 0xff2a20);
+glow(DX, 2.505, dz + .25, 0xff2a20, .9, .45, .5);
+
+// puerta entreabierta: luz que se cuela desde el pasillo (solo si CFG.doorOpen > 0)
+if (CFG.doorOpen > .02) {
+  const bc = canvasTex(256, (g, n) => {
+    const gr = g.createLinearGradient(0, 0, 0, n);
+    gr.addColorStop(0, '#ffffff'); gr.addColorStop(1, '#9fc4e8');
+    g.fillStyle = gr; g.fillRect(0, 0, n, n);
+  });
+  const corr = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 2.6), new THREE.MeshBasicMaterial({ map: bc, color: new THREE.Color(0xbfdcff).multiplyScalar(1.4) }));
+  corr.position.set(DX, 1.3, dz - .3); scene.add(corr); G.neon.push(corr);
+  const spill = new THREE.RectAreaLight(0xcfe6ff, 6, 1.3, 2.2);
+  spill.position.set(DX, 1.15, dz - .12); spill.lookAt(DX, 1.15, dz + 5);
+  scene.add(spill); G.lamp.push(spill);
+  floorGlow(DX, dz + 1.6, 0xcfe6ff, 1.5, 3.2, .45);
+}
+
 // magenta neon frame around the door
 box(.04, 2.42, .04, DX - .8, 1.21, dz + .1, MAG);
 box(.04, 2.42, .04, DX + .8, 1.21, dz + .1, MAG);

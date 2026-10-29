@@ -25,17 +25,9 @@ const CFG = {
 
 // ---------- Sizes ----------
 const PRESETS = [
-  ['Vertical Poster', '8K 4320×7680', 4320, 7680], ['Vertical Poster', '4K DCI 2160×4096', 2160, 4096],
-  ['Vertical Poster', '4K 2160×3840', 2160, 3840], ['Vertical Poster', '2K 1080×2048', 1080, 2048],
-  ['Vertical Poster', 'Full HD 1080×1920', 1080, 1920], ['Vertical Poster', 'HD 720×1280', 720, 1280],
-
-  ['Square Poster', '(8100x8100', 8100, 8100], ['Square Poster', '4320×4320', 4320, 4320],
-  ['Square Poster', '3000×3000', 3000, 3000], ['Square Poster', '2160x2160', 2160, 2160],
-  ['Square Poster', '1080×1080', 1080, 1080], ['Square Poster', '720×720', 720, 720],
-  
-  ['Horizontal Banner', '8K 7680×4320', 7680, 4320], ['Horizontal Banner', '4K DCI 4096×2160', 4096, 2160],
-  ['Horizontal Banner', '4K 3840×2160', 3840, 2160], ['Horizontal Banner', '2K 2048×1080', 2048, 1080],
-  ['Horizontal Banner', 'Full HD 1920×1080', 1920, 1080], ['Horizontal Banner', 'HD 1280×720', 1280, 720],
+  ['Vertical Poster', '8100x14000', 8100, 14000],
+  ['Horizontal Banner', '14000x8100', 14000, 8100],
+  ['Square Poster', '(8100x8100', 8100, 8100],
 
   ['Print Poster', 'One Sheet 8100x12000', 8100, 12000], ['Print Poster', 'Half Sheet 6600x8400', 6600, 8400],
   ['Print Poster', 'Window Card 4200x6600', 4200, 6600], ['Print Poster', 'Insert 4200x10800', 4200, 10800],

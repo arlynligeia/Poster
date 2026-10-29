@@ -25,8 +25,8 @@ const CFG = {
 
 // ---------- Sizes ----------
 const PRESETS = [
-  ['Vertical Poster', '8100x14400', 8100, 14000],
-  ['Horizontal Banner', '14400x8100', 14000, 8100],
+  ['Vertical Poster', '8100x14400', 8100, 14400],
+  ['Horizontal Banner', '14400x8100', 14400, 8100],
   ['Square Poster', '(8100x8100', 8100, 8100],
  
   ['Print Poster', 'One Sheet 8100x12000', 8100, 12000],

@@ -29,18 +29,24 @@ const PRESETS = [
   ['Vertical Poster', '4K 2160×3840', 2160, 3840], ['Vertical Poster', '2K 1080×2048', 1080, 2048],
   ['Vertical Poster', 'Full HD 1080×1920', 1080, 1920], ['Vertical Poster', 'HD 720×1280', 720, 1280],
 
-  ['Square Poster', '4320×4320', 4320, 4320],
-  ['Square Poster', '3000×3000', 3000, 3000], ['Square Poster', '2000×2000', 2000, 2000],
-  ['Square Poster', '1200×1200', 1200, 1200], ['Square Poster', '1080×1080', 1080, 1080],
+  ['Square Poster', '(8100x8100', 8100, 8100], ['Square Poster', '4320×4320', 4320, 4320],
+  ['Square Poster', '3000×3000', 3000, 3000], ['Square Poster', '2160x2160', 2160, 2160],
+  ['Square Poster', '1080×1080', 1080, 1080], ['Square Poster', '720×720', 720, 720],
   
   ['Horizontal Banner', '8K 7680×4320', 7680, 4320], ['Horizontal Banner', '4K DCI 4096×2160', 4096, 2160],
   ['Horizontal Banner', '4K 3840×2160', 3840, 2160], ['Horizontal Banner', '2K 2048×1080', 2048, 1080],
   ['Horizontal Banner', 'Full HD 1920×1080', 1920, 1080], ['Horizontal Banner', 'HD 1280×720', 1280, 720],
-  
-  ['Print Poster', 'Six sheet 81×81 in', 81, 81, 1], ['Print Poster', 'Bus shelter 48×70 in', 48, 70, 1],
-  ['Print Poster', 'Three sheet 41×81 in', 41, 81, 1], ['Print Poster', 'One sheet 27×40 in', 27, 40, 1],
-  ['Print Poster', 'Half sheet 22×28 in', 22, 28, 1], ['Print Poster', 'Window card 14×22 in', 14, 22, 1],
+
+  ['Print Poster', 'One Sheet 8100x12000', 8100, 12000], ['Print Poster', 'Bus Shelter 7200x10500', 7200, 10500], 
+  ['Print Poster', 'Half Sheet 6600x8400', 6600, 8400],  ['Print Poster', 'Three Sheet 6150x12150', 6150, 12150],
+  ['Print Poster', 'Roll-up Banner 5020x11811', 5020, 11811], ['Print Poster', 'Window Card 4200x6600', 4200, 6600], 
+  ['Print Poster', 'Insert 4200x10800', 4200, 10800], ['Print Poster', 'Lobby Card 3300×4200', 3300, 4200],
+
+  ['Print Poster', '24 Sheet 12300x5400', 12300, 5400],  
 ];
+
+
+
 const sizeEl = document.getElementById('size'), dpiEl = document.getElementById('dpi'), dpiBox = document.getElementById('dpiBox');
 const fovEl = document.getElementById('fov'), info = document.getElementById('info'), bar = document.getElementById('bar');
 const exposureEl = document.getElementById('exposure'), glowEl = document.getElementById('glowAmt');

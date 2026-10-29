@@ -29,12 +29,14 @@ const PRESETS = [
   ['Horizontal Banner', '14000x8100', 14000, 8100],
   ['Square Poster', '(8100x8100', 8100, 8100],
 
+  ['Youtube', 'Banner 1546x423', 1546, 423],
+
   ['Print Poster', 'One Sheet 8100x12000', 8100, 12000], ['Print Poster', 'Half Sheet 6600x8400', 6600, 8400],
   ['Print Poster', 'Window Card 4200x6600', 4200, 6600], ['Print Poster', 'Insert 4200x10800', 4200, 10800],
   ['Print Poster', 'Lobby Card 3300×4200', 3300, 4200],
 
   ['Print Poster', 'Bus Shelter 6000x9000', 6000, 9000], ['Print Poster', 'Three Sheet 6150x12150', 6150, 12150], 
-  ['Print Poster', 'Roll-up Banner 5019x11811', 5019, 11811], 
+  ['Print Poster', 'Roll-up Banner 5019x11811', 5019, 11811],
 
 ];
 

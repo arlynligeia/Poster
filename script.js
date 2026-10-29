@@ -37,12 +37,13 @@ const PRESETS = [
   ['Horizontal Banner', '4K 3840×2160', 3840, 2160], ['Horizontal Banner', '2K 2048×1080', 2048, 1080],
   ['Horizontal Banner', 'Full HD 1920×1080', 1920, 1080], ['Horizontal Banner', 'HD 1280×720', 1280, 720],
 
-  ['Print Poster', 'One Sheet 8100x12000', 8100, 12000], ['Print Poster', 'Bus Shelter 7200x10500', 7200, 10500], 
-  ['Print Poster', 'Half Sheet 6600x8400', 6600, 8400],  ['Print Poster', 'Three Sheet 6150x12150', 6150, 12150],
-  ['Print Poster', 'Roll-up Banner 5020x11811', 5020, 11811], ['Print Poster', 'Window Card 4200x6600', 4200, 6600], 
-  ['Print Poster', 'Insert 4200x10800', 4200, 10800], ['Print Poster', 'Lobby Card 3300×4200', 3300, 4200],
+  ['Print Poster', 'One Sheet 8100x12000', 8100, 12000], ['Print Poster', 'Half Sheet 6600x8400', 6600, 8400],
+  ['Print Poster', 'Window Card 4200x6600', 4200, 6600], ['Print Poster', 'Insert 4200x10800', 4200, 10800],
+  ['Print Poster', 'Lobby Card 3300×4200', 3300, 4200],
 
-  ['Print Poster', '24 Sheet 12300x5400', 12300, 5400],  
+  ['Print Poster', 'Bus Shelter 6000x9000', 6000, 9000], ['Print Poster', 'Three Sheet 6150x12150', 6150, 12150], 
+  ['Print Poster', 'Roll-up Banner 5019x11811', 5019, 11811], 
+
 ];
 
 
